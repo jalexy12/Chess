@@ -32,31 +32,57 @@ class Piece
 	end
   	
      def straight_in_any_direction(how_many)
+     	if how_many.instance_of?(Range)
 	     how_many.each do |num|
 	     	add_moves(Move.new(0, num))
 	     	add_moves(Move.new(0, -1 * num))
 	     	add_moves(Move.new(num, 0))
 	     	add_moves(Move.new(-1 * num, 0))
 		 end
+		else
+			add_moves(Move.new(0, how_many))
+	     	add_moves(Move.new(0, -1 * how_many))
+	     	add_moves(Move.new(how_many, 0))
+	     	add_moves(Move.new(-1 * how_many, 0))
+	     end
      end
 
      def l_shape
  	    add_moves(Move.new(2, 1))
      	add_moves(Move.new(-2, 1))
      	add_moves(Move.new(2, -1))
+     	add_moves(Move.new(-2, -1))
      	add_moves(Move.new(1, 2))
      	add_moves(Move.new(-1, 2))
      	add_moves(Move.new(1, -2))
+     	add_moves(Move.new(-1, -2))
+     end
+
+     def diagonal(how_many)
+     	if how_many.instance_of?(Range)
+	     how_many.each do |num|
+	     	add_moves(Move.new(-1 * num, -1 * num))
+	     	add_moves(Move.new(num, -1 * num))
+	     	add_moves(Move.new(num, num))
+	     	add_moves(Move.new(-1 * num, num))
+		 end
+		else
+			add_moves(Move.new(0, how_many))
+	     	add_moves(Move.new(0, -1 * how_many))
+	     	add_moves(Move.new(how_many, 0))
+	     	add_moves(Move.new(-1 * how_many, 0))
+	     end
      end
 
      def valid_move?(final_pos)
      	new_pos = cord_splitter(final_pos)
 		diff = [(@initial[0] - new_pos[0]), (@initial[1] - new_pos[1])]
 		@valid_moves.each do |move|
-			if move.coords === diff
-				p move.coords
+			if move.coords == diff
+				return true
 			end
 		end
+		return false
      end
 
 
@@ -69,6 +95,32 @@ class Piece
 		return actual_position
 	end
 end
+class Pawn < Piece
+	def initialize(initial)
+		@initial = cord_splitter(initial)
+		if @initial[0] == 1 || 2 
+			@whichteam = "Black"
+		else
+			@whichteam = "White"
+		end
+		@valid_moves = []
+		@movecount = 0
+		moves
+	end
+	def moves
+		if @movecount == 0
+			straight_in_any_direction(2)
+		else
+			straight_in_any_direction(1)
+		end
+	end
+end
+class Queen < Piece
+	def moves
+		straight_in_any_direction(1..7)
+		diagonal(1..7)
+	end
+end
 
 class Rook < Piece
 	def moves
@@ -79,6 +131,7 @@ end
 class King < Piece
 	def moves
 		straight_in_any_direction(1)
+		diagonal(1)
 	end
 end
 
@@ -88,22 +141,7 @@ class Knight < Piece
 	end
 end
 
-# class Bishop < Piece
-# 	def move(final_pos)
-# 		new_position = cord_splitter(final_pos)
-
-# 		valid = nil 
-
-# 		# distance_x = (@initial[0] - new_position[0])
-# 		# distance_y = (@initial[1] - new_position[1])
-		
-# 		if distance_x ==  && distance_y == 1 
-# 			@valid = true 
-# 		elsif 
-# 			d
-			
-# 	end
-# end
-
 rook = Rook.new("a1")
-rook.valid_move?("h1")
+king = King.new("e1")
+knight = Knight.new("c1")
+queen = Queen.new("d1")

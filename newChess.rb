@@ -18,19 +18,19 @@ Board = Struct.new(:column, :row)
 class Piece
 	def initialize(initial)
 		@initial = cord_splitter(initial)
-		if @initial[0] == 1 && 2 
+		if @initial[0] == 1 || 2 
 			@whichteam = "Black"
 		else
 			@whichteam = "White"
 		end
 		@valid_moves = []
+		moves
 	end
 	
     def add_moves(move)
 		@valid_moves.push(move)
 	end
-  
-
+  	
      def straight_in_any_direction(how_many)
 	     how_many.each do |num|
 	     	add_moves(Move.new(0, num))
@@ -41,7 +41,22 @@ class Piece
      end
 
      def l_shape
-     	@moves.push(Move.new(2, 1), Move.new(-2, 1), Move.new(2, -1), Move.new(1, 2), Move.new(-1, 2), Move.new(1, -2))
+ 	    add_moves(Move.new(2, 1))
+     	add_moves(Move.new(-2, 1))
+     	add_moves(Move.new(2, -1))
+     	add_moves(Move.new(1, 2))
+     	add_moves(Move.new(-1, 2))
+     	add_moves(Move.new(1, -2))
+     end
+
+     def valid_move?(final_pos)
+     	new_pos = cord_splitter(final_pos)
+		diff = [(@initial[0] - new_pos[0]), (@initial[1] - new_pos[1])]
+		@valid_moves.each do |move|
+			if move.coords === diff
+				p move.coords
+			end
+		end
      end
 
 
@@ -56,24 +71,21 @@ class Piece
 end
 
 class Rook < Piece
-	
-	def valid_move?(final_pos)
-		@moves = straight_in_any_direction(1..7)
-
-		new_pos = cord_splitter(final_pos)
-
-		
-		@moves.each do |move|
-			binding.pry
-			if move.coords == new_pos 
-				valid_moves.push(move)
-				puts "hello"
-			end
-		end
-		p valid_moves
-		
+	def moves
+		straight_in_any_direction(1..7)
 	end
+end
 
+class King < Piece
+	def moves
+		straight_in_any_direction(1)
+	end
+end
+
+class Knight < Piece
+	def moves
+		l_shape
+	end
 end
 
 # class Bishop < Piece
@@ -94,4 +106,4 @@ end
 # end
 
 rook = Rook.new("a1")
-rook.valid_move?("a2")
+rook.valid_move?("h1")
